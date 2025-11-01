@@ -1,0 +1,2 @@
+source /home/ybin/nas-fan-control/build/gdbinit/symbols
+source /home/ybin/nas-fan-control/build/gdbinit/connect

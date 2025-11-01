@@ -1,0 +1,2 @@
+source /home/ybin/nas-fan-control/build/bootloader/gdbinit/symbols
+source /home/ybin/nas-fan-control/build/bootloader/gdbinit/connect
