@@ -21,13 +21,13 @@
 #include "esp_pm.h"
 //#include "esp_sleep.h"
 //#include "console/console.h"
+#include "led_strip.h"
 
 const static char *TAG = "Fan-CTL";
 /*---------------------------------------------------------------
         GPIO Macros
 ---------------------------------------------------------------*/
-#define GPIO_OUTPUT_LED_B    (13)
-#define GPIO_OUTPUT_PIN_SEL  (1ULL<<GPIO_OUTPUT_LED_B)
+#define BLINK_GPIO CONFIG_BLINK_GPIO    // Define the LED GPIO
 /*---------------------------------------------------------------
         LEDC Macros
 ---------------------------------------------------------------*/
@@ -43,11 +43,11 @@ const static char *TAG = "Fan-CTL";
 ---------------------------------------------------------------*/
 //ADC1 Channels
 #if CONFIG_IDF_TARGET_ESP32
-#define EXAMPLE_ADC1_CHAN0          ADC_CHANNEL_4
-//#define EXAMPLE_ADC1_CHAN1          ADC_CHANNEL_5
+#define ADC1_ISEN          ADC_CHANNEL_4
+//#define ADC1_NTC          ADC_CHANNEL_5
 #else
-#define EXAMPLE_ADC1_CHAN0          ADC_CHANNEL_0
-#define EXAMPLE_ADC1_CHAN1          ADC_CHANNEL_1
+#define ADC1_ISEN        ADC_CHANNEL_1      // Define the current channel
+#define ADC1_NTC         ADC_CHANNEL_3      // Define the temp channel
 #endif
 
 #if (SOC_ADC_PERIPH_NUM >= 2) && !CONFIG_IDF_TARGET_ESP32C3
@@ -74,13 +74,12 @@ const static char *TAG = "Fan-CTL";
 #define PCNT_HIGH_LIMIT 1024
 #define PCNT_LOW_LIMIT  -1024
 
-#define PCNT_GPIO_EDGE 11
+#define PCNT_GPIO_EDGE 11       // Define the count edge input GPIO
 #define PCNT_GPIO_LEVEL -1
 /*---------------------------------------------------------------
         Fan control profile Macros
 ---------------------------------------------------------------*/
 #define FAN_START_DUTY   0.23
-//#define FAN_STOP_DUTY    0.17
 #define FAN_SELFTEST_UPER    0.35
 
 #define OFFSET0     0
@@ -90,19 +89,20 @@ const static char *TAG = "Fan-CTL";
 #define GAIN1       0.000363636
 #define GAIN2       0.000100000
 
-#define TERMAL_MAX 10.0
-#define T_ZERO    25.0
-#define T_MAX    50.0
+//#define TERMAL_MAX 10.0
+#define T_ZERO    28
+#define T_MAX    56
 
 #define DEVIDE      0.681
 #define SCALE       (1.0/DEVIDE)
 #define SELFHEAT    0.75
 
-#define TSENS_FILTFACTOR    0.03125
-//#define TCELL_FILTFACTOR    0.03125
-#define TCELL_FILTFACTOR    0.0625
-//#define CURRENT_FILTFACTOR  0.01953125
-#define CURRENT_FILTFACTOR  0.09375
+#define TSENS_FILTFACTOR    0.09375
+#define TCELL_FILTFACTOR    0.125
+
+#define CURRENT_FILTFACTOR  0.1875
+#define ISENS_OFFSET        250      // 250mV
+#define CURRENT_GAIN        2.5      // 1/(400m V/A) => 2.5 mA/mV
 
 adc_oneshot_unit_handle_t adc1_handle;
 adc_oneshot_unit_init_cfg_t init_config1 = {
@@ -115,9 +115,61 @@ static float tcell_filted;
 static bool FAN_ON = true;
 static bool ON_SYNC = false;
 static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle);
-//static bool MODE = FAN_STOP;
 static void example_adc_calibration_deinit(adc_cali_handle_t handle);
+static char red = 0;
+static char green = 0;
+static char blue = 0;
 
+#ifdef CONFIG_BLINK_LED_STRIP
+
+static led_strip_handle_t led_strip;
+
+static void configure_led(void)
+{
+    ESP_LOGI(TAG, "Example configured to blink addressable LED!");
+    /* LED strip initialization with the GPIO and pixels number*/
+    led_strip_config_t strip_config = {
+        .strip_gpio_num = BLINK_GPIO,
+        .max_leds = 1, // at least one LED on board
+    };
+#if CONFIG_BLINK_LED_STRIP_BACKEND_RMT
+    led_strip_rmt_config_t rmt_config = {
+        .resolution_hz = 10 * 1000 * 1000, // 10MHz
+        .flags.with_dma = false,
+    };
+    ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config, &led_strip));
+#elif CONFIG_BLINK_LED_STRIP_BACKEND_SPI
+    led_strip_spi_config_t spi_config = {
+        .spi_bus = SPI2_HOST,
+        .flags.with_dma = true,
+    };
+    ESP_ERROR_CHECK(led_strip_new_spi_device(&strip_config, &spi_config, &led_strip));
+#else
+#error "unsupported LED strip backend"
+#endif
+    /* Set all LED off to clear all pixels */
+    led_strip_clear(led_strip);
+}
+
+#elif CONFIG_BLINK_LED_GPIO
+
+static void blink_led(void)
+{
+    /* Set the GPIO level according to the state (LOW or HIGH)*/
+    gpio_set_level(BLINK_GPIO, s_led_state);
+}
+
+static void configure_led(void)
+{
+    ESP_LOGI(TAG, "Example configured to blink GPIO LED!");
+    gpio_reset_pin(BLINK_GPIO);
+    /* Set the GPIO as a push/pull output */
+    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+}
+
+#else
+#error "unsupported LED type"
+#endif
 
 static void fan_pwm_init(void)
 {
@@ -157,7 +209,7 @@ static float i2duty(float i)
         else
             return OFFSET0+GAIN0*OFFSET1-GAIN1*OFFSET1+GAIN1*OFFSET2-GAIN2*OFFSET2+GAIN2*i;
 }
-
+/*
 static float tt2duty(float troom, float tcell)
 {
     float termal;
@@ -180,6 +232,33 @@ static float tt2duty(float troom, float tcell)
             else
                 return 0.0;
 }
+*/
+static float t2duty(float troom, float tcell)
+{
+    float termal;
+
+    termal = tcell-troom;
+
+    if(termal < -9.0)
+    {
+        led_strip_set_pixel(led_strip, 0, green, red, 100);
+        blue = 60;
+        led_strip_refresh(led_strip);
+        ESP_LOGW(TAG, "Cell-sensor unhealth,room-temp used");
+        return (troom-T_ZERO)/(T_MAX-T_ZERO);
+    }
+    else
+    {
+        if(blue != 0)
+        {
+            led_strip_set_pixel(led_strip, 0, green, red, 0);
+            blue = 0;
+            led_strip_refresh(led_strip);
+            ESP_LOGW(TAG, "Cell-sensor recover");
+        }
+        return (tcell-T_ZERO)/(T_MAX-T_ZERO);
+    }
+}
 
 static float fusion(float major,float minor)
 {
@@ -197,12 +276,12 @@ static float fusion(float major,float minor)
 
 static float ntc2temp(int voltage)
 {
-    float temp = 3.79e-5;
+    float temp = 3.81e-5;    //quadratic term coefficient
 
-    temp -= 6.76e-9*voltage;
+    temp -= 6.8e-9*voltage;    //cubic term coefficient
     temp *= voltage;
     temp *= voltage;
-    temp -= 9.65e-2*voltage;
+    temp -= 9.68e-2*voltage;    //linear term coefficient
     return temp + 116.0;
 }
 
@@ -252,46 +331,47 @@ void adc_regulars(void *arg)
         .atten = EXAMPLE_ADC_ATTEN,
         .bitwidth = ADC_BITWIDTH_DEFAULT,
     };
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, EXAMPLE_ADC1_CHAN0, &config));
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, EXAMPLE_ADC1_CHAN1, &config));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC1_ISEN, &config));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC1_NTC, &config));
     ESP_LOGI(TAG_adc, "ADC1 initialized and configured");
 
     //-------------ADC1 Calibration Init---------------//
     adc_cali_handle_t adc1_cali_chan0_handle = NULL;
     adc_cali_handle_t adc1_cali_chan1_handle = NULL;
-    bool do_calibration1_chan0 = example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN0, EXAMPLE_ADC_ATTEN, &adc1_cali_chan0_handle);
-    bool do_calibration1_chan1 = example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN1, EXAMPLE_ADC_ATTEN, &adc1_cali_chan1_handle);
+    bool do_calibration1_chan0 = example_adc_calibration_init(ADC_UNIT_1, ADC1_ISEN, EXAMPLE_ADC_ATTEN, &adc1_cali_chan0_handle);
+    bool do_calibration1_chan1 = example_adc_calibration_init(ADC_UNIT_1, ADC1_NTC, EXAMPLE_ADC_ATTEN, &adc1_cali_chan1_handle);
 
-    //-------------ADC1 ch0 first Read---------------//
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw0));
-    ESP_LOGI(TAG_adc, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, EXAMPLE_ADC1_CHAN0, adc_raw0);
+    //-------------ADC1 Isense first Read---------------//
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_ISEN, &adc_raw0));
+    ESP_LOGI(TAG_adc, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_ISEN, adc_raw0);
     if (do_calibration1_chan0) {
         ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_chan0_handle, adc_raw0, &vol_idc));
-        ESP_LOGI(TAG_adc, "ADC%d Channel[%d] Cali Voltage: %d mV", ADC_UNIT_1 + 1, EXAMPLE_ADC1_CHAN0, vol_idc);
+        ESP_LOGI(TAG_adc, "ADC%d Channel[%d] Cali Voltage: %d mV", ADC_UNIT_1 + 1, ADC1_ISEN, vol_idc);
     }
-    current_filted = (float)vol_idc;
-    //-------------ADC1 ch1 first Read---------------//
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw1));
-    ESP_LOGI(TAG_adc, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, EXAMPLE_ADC1_CHAN1, adc_raw1);
+    current_filted = CURRENT_GAIN*(vol_idc-ISENS_OFFSET);
+    //-------------ADC1 NTC first Read---------------//
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_NTC, &adc_raw1));
+    ESP_LOGI(TAG_adc, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_NTC, adc_raw1);
     if (do_calibration1_chan1) {
         ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_chan1_handle, adc_raw1, &vol_ntc));
-        ESP_LOGI(TAG_adc, "ADC%d Channel[%d] Cali Voltage: %d mV", ADC_UNIT_1 + 1, EXAMPLE_ADC1_CHAN1, vol_ntc);
+        ESP_LOGI(TAG_adc, "ADC%d Channel[%d] Cali Voltage: %d mV", ADC_UNIT_1 + 1, ADC1_NTC, vol_ntc);
     }
     tcell_filted = ntc2temp(vol_ntc);
 
     while(1)
     {
         //-------------ADC1 ch0 Read---------------//
-        ESP_ERROR_CHECK(adc_oneshot_get_calibrated_result(adc1_handle, adc1_cali_chan0_handle, EXAMPLE_ADC1_CHAN0, &vol_idc));
+        ESP_ERROR_CHECK(adc_oneshot_get_calibrated_result(adc1_handle, adc1_cali_chan0_handle, ADC1_ISEN, &vol_idc));
         //-------------ADC1 ch1 Read---------------//
-        ESP_ERROR_CHECK(adc_oneshot_get_calibrated_result(adc1_handle, adc1_cali_chan1_handle, EXAMPLE_ADC1_CHAN1, &vol_ntc));
+        ESP_ERROR_CHECK(adc_oneshot_get_calibrated_result(adc1_handle, adc1_cali_chan1_handle, ADC1_NTC, &vol_ntc));
 
         //-------------ADC1 Data Filter---------------//
         tcell_filted *= 1.0-TCELL_FILTFACTOR;
         tcell_filted += ntc2temp(vol_ntc)*TCELL_FILTFACTOR;
 
-        current_filted *= 1.0-CURRENT_FILTFACTOR;
-        current_filted += CURRENT_FILTFACTOR*vol_idc;
+        vol_idc -= ISENS_OFFSET;
+        current_filted *= (1.0-CURRENT_FILTFACTOR);
+        current_filted += CURRENT_FILTFACTOR*CURRENT_GAIN*(float)vol_idc;
 
         vTaskDelay(2000 / portTICK_PERIOD_MS);
         if(ON_SYNC == false)
@@ -302,8 +382,8 @@ void adc_regulars(void *arg)
             //-------------ADC1 Re-Init---------------//
             ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
             //-------------ADC1 Config---------------//
-            ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, EXAMPLE_ADC1_CHAN0, &config));
-            ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, EXAMPLE_ADC1_CHAN1, &config));
+            ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC1_ISEN, &config));
+            ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC1_NTC, &config));
             ON_SYNC = FAN_ON;
         }
 
@@ -325,9 +405,10 @@ void app_main(void *)
     //-------------Fan PWM Init---------------//
     // Set the LEDC peripheral configuration
     fan_pwm_init();
-    ledc_stop(LEDC_MODE, LEDC_CHANNEL, 1);
     ESP_LOGI(TAG, "FAN PWM initialized");
+    ledc_stop(LEDC_MODE, LEDC_CHANNEL, 1);
     //-------------GPIO Init---------------//
+/*
     //zero-initialize the config structure.
     gpio_config_t io_conf = {};
     //disable interrupt
@@ -344,6 +425,13 @@ void app_main(void *)
     gpio_config(&io_conf);
     gpio_set_level(GPIO_OUTPUT_LED_B, 0);
     ESP_LOGI(TAG, "GPIO initialized");
+*/
+    /* Configure the peripheral according to the LED type */
+    configure_led();
+
+    led_strip_set_pixel(led_strip, 0, 24, 24, 24);
+    led_strip_refresh(led_strip);
+    ESP_LOGI(TAG, "LED initialized");
 
 #if EXAMPLE_USE_ADC2
     //-------------ADC2 Init---------------//
@@ -400,15 +488,18 @@ void app_main(void *)
     ESP_ERROR_CHECK(pcnt_unit_start(pcnt_unit));
 
     static int pulse_count = 0;
-    ESP_ERROR_CHECK(pcnt_unit_get_count(pcnt_unit, &pulse_count));
     ESP_LOGI(TAG, "waiting for Fan stop rotation...");
-    while(pulse_count != 0)
+    do
     {
         ESP_ERROR_CHECK(pcnt_unit_clear_count(pcnt_unit));
         vTaskDelay(pdMS_TO_TICKS(1000));
         ESP_ERROR_CHECK(pcnt_unit_get_count(pcnt_unit, &pulse_count));
-    }
+    }while(pulse_count != 0);
+
+    led_strip_set_pixel(led_strip, 0, 48, 0, 0);    //Green
+    led_strip_refresh(led_strip);
     vTaskDelay(pdMS_TO_TICKS(3000));
+    led_strip_clear(led_strip);
 
     //-------------Fan Self-Test program---------------//
     int DutyTestInv;
@@ -418,9 +509,10 @@ void app_main(void *)
         ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, DutyTestInv));
         ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL));
         vTaskDelay(pdMS_TO_TICKS(150));
-        gpio_set_level(GPIO_OUTPUT_LED_B, 1);
+        led_strip_set_pixel(led_strip, 0, 24, 24, 0);    //Green+Red
+        led_strip_refresh(led_strip);
         vTaskDelay(pdMS_TO_TICKS(50));
-        gpio_set_level(GPIO_OUTPUT_LED_B, 0);
+        led_strip_clear(led_strip);
 
         ESP_ERROR_CHECK(pcnt_unit_get_count(pcnt_unit, &pulse_count));
 
@@ -433,8 +525,15 @@ void app_main(void *)
     }
     if(DutyTestInv <= (int)(255-FAN_SELFTEST_UPER*255))
     {
-        gpio_set_level(GPIO_OUTPUT_LED_B, 1);
-        ESP_LOGE(TAG, "Fan Self-testing fail due to missing FG signal!"); 
+        red = 100;
+        led_strip_set_pixel(led_strip, 0, 0, red, 0);
+        led_strip_refresh(led_strip);
+        ESP_LOGW(TAG, "Fan Self-testing fail due to missing FG signal!"); 
+    }
+    else
+    {
+        led_strip_set_pixel(led_strip, 0, 100, 0, 0);
+        led_strip_refresh(led_strip);
     }
 
     static float idc;
@@ -459,7 +558,7 @@ void app_main(void *)
     while (1)
     {
         idc = i2duty(current_filted);
-        tdc = tt2duty(troom_filted,tcell_filted);
+        tdc = t2duty(troom_filted,tcell_filted);
         duty = fusion(tdc,idc);
         duty_inv = 1.0-duty;
         ESP_LOGI(TAG, "T->duty: %.02f,I->duty: %.02f =>Merger: %.02f", tdc, idc, duty);
@@ -474,11 +573,29 @@ void app_main(void *)
                 ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, (unsigned char)(duty_inv*255));
                 ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
                 ESP_LOGI(TAG, "Duty: %d%%, RPM=%d", (int)(duty*100), pulse_count*15);   //pulse/2(pole)/2(sec)*60(sec)
+                if(pulse_count == 0)
+                {
+                    red = 100;
+                    led_strip_set_pixel(led_strip, 0, green, red, blue);
+                    led_strip_refresh(led_strip); 
+                    ESP_LOGW(TAG, "Fan failure due to missing FG signal!"); 
+                }
+                else
+                    if(red != 0)
+                    {
+                        red = 0;
+                        led_strip_set_pixel(led_strip, 0, green, red, blue);
+                        led_strip_refresh(led_strip); 
+                        ESP_LOGI(TAG, "Fan recover with FG signal!"); 
+                    }
             }
             else
             {
                 ledc_stop(LEDC_MODE, LEDC_CHANNEL, 1);
                 ESP_ERROR_CHECK(pcnt_unit_disable(pcnt_unit));
+                green = 0;
+                led_strip_set_pixel(led_strip, 0, green, red, blue);
+                led_strip_refresh(led_strip);
                 ESP_LOGI(TAG, "Low RPM: %d%%, Fan => OFF", (int)(duty*100));
                 FAN_ON = false;
                 ON_SYNC = false;
@@ -490,6 +607,9 @@ void app_main(void *)
             {
                 ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, (unsigned char)(duty_inv*255));
                 ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
+                green = 60;
+                led_strip_set_pixel(led_strip, 0, green, red, blue);
+                led_strip_refresh(led_strip);
                 ESP_LOGI(TAG, "Duty: %d%%, Fan => START", (int)(duty*100));
                 //pcnt eable and start
                 ESP_ERROR_CHECK(pcnt_unit_enable(pcnt_unit));

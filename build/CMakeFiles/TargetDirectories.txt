@@ -493,6 +493,13 @@
 /home/ybin/nas-fan-control/build/esp-idf/esp_adc/CMakeFiles/install.dir
 /home/ybin/nas-fan-control/build/esp-idf/esp_adc/CMakeFiles/install/local.dir
 /home/ybin/nas-fan-control/build/esp-idf/esp_adc/CMakeFiles/install/strip.dir
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/CMakeFiles/__idf_led_strip.dir
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/CMakeFiles/edit_cache.dir
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/CMakeFiles/rebuild_cache.dir
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/CMakeFiles/list_install_components.dir
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/CMakeFiles/install.dir
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/CMakeFiles/install/local.dir
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/CMakeFiles/install/strip.dir
 /home/ybin/nas-fan-control/build/esp-idf/main/CMakeFiles/__idf_main.dir
 /home/ybin/nas-fan-control/build/esp-idf/main/CMakeFiles/edit_cache.dir
 /home/ybin/nas-fan-control/build/esp-idf/main/CMakeFiles/rebuild_cache.dir

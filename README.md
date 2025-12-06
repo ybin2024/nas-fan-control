@@ -26,7 +26,7 @@ See circuit upload from PNG later on.
 
 * ESP32-H2 SupperMini development board
 * AD8418 current sensing
-* Pegboard for integrated components and DIY circuit
+* Bread board for integrated components and DIY circuit
 
 In this example, you need to connect a voltage source (e.g. a DC power supply) to the GPIO pins specified in `oneshot_read_main.c` (see the macros defined on the top of the source file). Feel free to modify the pin setting.
 

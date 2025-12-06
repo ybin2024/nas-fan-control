@@ -1,0 +1,17 @@
+dependencies:
+  idf:
+    source:
+      type: idf
+    version: 5.5.0
+  led_strip:
+    dependencies: []
+    source:
+      path: /home/ybin/nas-fan-control/managed_components/led_strip
+      type: local
+    version: 3.0.2
+direct_dependencies:
+- espressif/led_strip
+- idf
+manifest_hash: 9ef3492a206bb7fb2748ef31e798b68ff8724cc96636b96d159adb8e19d5e091
+target: esp32h2
+version: 2.0.0

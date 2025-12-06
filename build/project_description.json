@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "nas-fan-control",
-    "project_version":    "1",
+    "project_version":    "b07fc0c-dirty",
     "project_path":       "/home/ybin/nas-fan-control",
     "idf_path":           "/home/ybin/esp/v5.5/esp-idf",
     "build_dir":          "/home/ybin/nas-fan-control/build",
@@ -22,11 +22,11 @@
     "c_compiler":         "/home/ybin/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc",
     "config_environment" : {
         "COMPONENT_KCONFIGS" : "/home/ybin/esp/v5.5/esp-idf/components/driver/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/efuse/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_adc/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_common/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_ana_cmpr/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_bitscrambler/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_dac/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_gpio/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_gptimer/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_i2c/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_i2s/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_ledc/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_mcpwm/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_parlio/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_pcnt/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_rmt/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdm/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_spi/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_tsens/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_twai/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_uart/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_driver_usb_serial_jtag/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_hw_support/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_mm/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_partition/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_pm/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_ringbuf/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_rom/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_security/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_system/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/esp_timer/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/freertos/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/hal/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/heap/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/log/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/mbedtls/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/newlib/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/pthread/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/soc/Kconfig;/home/ybin/esp/v5.5/esp-idf/components/spi_flash/Kconfig",
-        "COMPONENT_KCONFIGS_PROJBUILD" : "/home/ybin/esp/v5.5/esp-idf/components/bootloader/Kconfig.projbuild;/home/ybin/esp/v5.5/esp-idf/components/esp_app_format/Kconfig.projbuild;/home/ybin/esp/v5.5/esp-idf/components/esp_rom/Kconfig.projbuild;/home/ybin/esp/v5.5/esp-idf/components/esptool_py/Kconfig.projbuild;/home/ybin/esp/v5.5/esp-idf/components/partition_table/Kconfig.projbuild"
+        "COMPONENT_KCONFIGS_PROJBUILD" : "/home/ybin/esp/v5.5/esp-idf/components/bootloader/Kconfig.projbuild;/home/ybin/esp/v5.5/esp-idf/components/esp_app_format/Kconfig.projbuild;/home/ybin/esp/v5.5/esp-idf/components/esp_rom/Kconfig.projbuild;/home/ybin/esp/v5.5/esp-idf/components/esptool_py/Kconfig.projbuild;/home/ybin/esp/v5.5/esp-idf/components/partition_table/Kconfig.projbuild;/home/ybin/nas-fan-control/main/Kconfig.projbuild"
     },
     "common_component_reqs": [ "cxx", "newlib", "freertos", "esp_hw_support", "heap", "log", "soc", "hal", "esp_rom", "esp_common", "esp_system", "riscv" ],
-    "build_components" : [ "app_update", "bootloader", "bootloader_support", "cxx", "driver", "efuse", "esp_adc", "esp_app_format", "esp_bootloader_format", "esp_common", "esp_driver_ana_cmpr", "esp_driver_bitscrambler", "esp_driver_dac", "esp_driver_gpio", "esp_driver_gptimer", "esp_driver_i2c", "esp_driver_i2s", "esp_driver_ledc", "esp_driver_mcpwm", "esp_driver_parlio", "esp_driver_pcnt", "esp_driver_rmt", "esp_driver_sdio", "esp_driver_sdm", "esp_driver_sdmmc", "esp_driver_sdspi", "esp_driver_spi", "esp_driver_tsens", "esp_driver_twai", "esp_driver_uart", "esp_driver_usb_serial_jtag", "esp_hw_support", "esp_mm", "esp_partition", "esp_pm", "esp_ringbuf", "esp_rom", "esp_security", "esp_system", "esp_timer", "esptool_py", "freertos", "hal", "heap", "log", "main", "mbedtls", "newlib", "partition_table", "pthread", "riscv", "sdmmc", "soc", "spi_flash", "" ],
-    "build_component_paths" : [ "/home/ybin/esp/v5.5/esp-idf/components/app_update", "/home/ybin/esp/v5.5/esp-idf/components/bootloader", "/home/ybin/esp/v5.5/esp-idf/components/bootloader_support", "/home/ybin/esp/v5.5/esp-idf/components/cxx", "/home/ybin/esp/v5.5/esp-idf/components/driver", "/home/ybin/esp/v5.5/esp-idf/components/efuse", "/home/ybin/esp/v5.5/esp-idf/components/esp_adc", "/home/ybin/esp/v5.5/esp-idf/components/esp_app_format", "/home/ybin/esp/v5.5/esp-idf/components/esp_bootloader_format", "/home/ybin/esp/v5.5/esp-idf/components/esp_common", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_ana_cmpr", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_bitscrambler", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_dac", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_gpio", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_gptimer", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_i2c", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_i2s", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_ledc", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_mcpwm", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_parlio", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_pcnt", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_rmt", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdio", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdm", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdmmc", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdspi", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_spi", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_tsens", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_twai", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_uart", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_usb_serial_jtag", "/home/ybin/esp/v5.5/esp-idf/components/esp_hw_support", "/home/ybin/esp/v5.5/esp-idf/components/esp_mm", "/home/ybin/esp/v5.5/esp-idf/components/esp_partition", "/home/ybin/esp/v5.5/esp-idf/components/esp_pm", "/home/ybin/esp/v5.5/esp-idf/components/esp_ringbuf", "/home/ybin/esp/v5.5/esp-idf/components/esp_rom", "/home/ybin/esp/v5.5/esp-idf/components/esp_security", "/home/ybin/esp/v5.5/esp-idf/components/esp_system", "/home/ybin/esp/v5.5/esp-idf/components/esp_timer", "/home/ybin/esp/v5.5/esp-idf/components/esptool_py", "/home/ybin/esp/v5.5/esp-idf/components/freertos", "/home/ybin/esp/v5.5/esp-idf/components/hal", "/home/ybin/esp/v5.5/esp-idf/components/heap", "/home/ybin/esp/v5.5/esp-idf/components/log", "/home/ybin/nas-fan-control/main", "/home/ybin/esp/v5.5/esp-idf/components/mbedtls", "/home/ybin/esp/v5.5/esp-idf/components/newlib", "/home/ybin/esp/v5.5/esp-idf/components/partition_table", "/home/ybin/esp/v5.5/esp-idf/components/pthread", "/home/ybin/esp/v5.5/esp-idf/components/riscv", "/home/ybin/esp/v5.5/esp-idf/components/sdmmc", "/home/ybin/esp/v5.5/esp-idf/components/soc", "/home/ybin/esp/v5.5/esp-idf/components/spi_flash", "" ],
+    "build_components" : [ "app_update", "bootloader", "bootloader_support", "cxx", "driver", "efuse", "esp_adc", "esp_app_format", "esp_bootloader_format", "esp_common", "esp_driver_ana_cmpr", "esp_driver_bitscrambler", "esp_driver_dac", "esp_driver_gpio", "esp_driver_gptimer", "esp_driver_i2c", "esp_driver_i2s", "esp_driver_ledc", "esp_driver_mcpwm", "esp_driver_parlio", "esp_driver_pcnt", "esp_driver_rmt", "esp_driver_sdio", "esp_driver_sdm", "esp_driver_sdmmc", "esp_driver_sdspi", "esp_driver_spi", "esp_driver_tsens", "esp_driver_twai", "esp_driver_uart", "esp_driver_usb_serial_jtag", "esp_hw_support", "esp_mm", "esp_partition", "esp_pm", "esp_ringbuf", "esp_rom", "esp_security", "esp_system", "esp_timer", "esptool_py", "freertos", "hal", "heap", "led_strip", "log", "main", "mbedtls", "newlib", "partition_table", "pthread", "riscv", "sdmmc", "soc", "spi_flash", "" ],
+    "build_component_paths" : [ "/home/ybin/esp/v5.5/esp-idf/components/app_update", "/home/ybin/esp/v5.5/esp-idf/components/bootloader", "/home/ybin/esp/v5.5/esp-idf/components/bootloader_support", "/home/ybin/esp/v5.5/esp-idf/components/cxx", "/home/ybin/esp/v5.5/esp-idf/components/driver", "/home/ybin/esp/v5.5/esp-idf/components/efuse", "/home/ybin/esp/v5.5/esp-idf/components/esp_adc", "/home/ybin/esp/v5.5/esp-idf/components/esp_app_format", "/home/ybin/esp/v5.5/esp-idf/components/esp_bootloader_format", "/home/ybin/esp/v5.5/esp-idf/components/esp_common", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_ana_cmpr", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_bitscrambler", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_dac", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_gpio", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_gptimer", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_i2c", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_i2s", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_ledc", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_mcpwm", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_parlio", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_pcnt", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_rmt", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdio", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdm", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdmmc", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_sdspi", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_spi", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_tsens", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_twai", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_uart", "/home/ybin/esp/v5.5/esp-idf/components/esp_driver_usb_serial_jtag", "/home/ybin/esp/v5.5/esp-idf/components/esp_hw_support", "/home/ybin/esp/v5.5/esp-idf/components/esp_mm", "/home/ybin/esp/v5.5/esp-idf/components/esp_partition", "/home/ybin/esp/v5.5/esp-idf/components/esp_pm", "/home/ybin/esp/v5.5/esp-idf/components/esp_ringbuf", "/home/ybin/esp/v5.5/esp-idf/components/esp_rom", "/home/ybin/esp/v5.5/esp-idf/components/esp_security", "/home/ybin/esp/v5.5/esp-idf/components/esp_system", "/home/ybin/esp/v5.5/esp-idf/components/esp_timer", "/home/ybin/esp/v5.5/esp-idf/components/esptool_py", "/home/ybin/esp/v5.5/esp-idf/components/freertos", "/home/ybin/esp/v5.5/esp-idf/components/hal", "/home/ybin/esp/v5.5/esp-idf/components/heap", "/home/ybin/nas-fan-control/managed_components/led_strip", "/home/ybin/esp/v5.5/esp-idf/components/log", "/home/ybin/nas-fan-control/main", "/home/ybin/esp/v5.5/esp-idf/components/mbedtls", "/home/ybin/esp/v5.5/esp-idf/components/newlib", "/home/ybin/esp/v5.5/esp-idf/components/partition_table", "/home/ybin/esp/v5.5/esp-idf/components/pthread", "/home/ybin/esp/v5.5/esp-idf/components/riscv", "/home/ybin/esp/v5.5/esp-idf/components/sdmmc", "/home/ybin/esp/v5.5/esp-idf/components/soc", "/home/ybin/esp/v5.5/esp-idf/components/spi_flash", "" ],
     "build_component_info" : {
         "app_update": {
             "alias": "idf::app_update",
@@ -688,6 +688,21 @@
             "sources": [ "/home/ybin/esp/v5.5/esp-idf/components/heap/heap_caps_base.c", "/home/ybin/esp/v5.5/esp-idf/components/heap/heap_caps.c", "/home/ybin/esp/v5.5/esp-idf/components/heap/heap_caps_init.c", "/home/ybin/esp/v5.5/esp-idf/components/heap/multi_heap.c", "/home/ybin/esp/v5.5/esp-idf/components/heap/port/memory_layout_utils.c", "/home/ybin/esp/v5.5/esp-idf/components/heap/port/esp32h2/memory_layout.c" ],
             "include_dirs": [ "include", "tlsf" ]
         },
+        "led_strip": {
+            "alias": "idf::led_strip",
+            "target": "___idf_led_strip",
+            "prefix": "idf",
+            "dir": "/home/ybin/nas-fan-control/managed_components/led_strip",
+            "type": "LIBRARY",
+            "lib": "__idf_led_strip",
+            "reqs": [ "esp_driver_rmt", "esp_driver_spi" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "file": "/home/ybin/nas-fan-control/build/esp-idf/led_strip/libled_strip.a",
+            "sources": [ "/home/ybin/nas-fan-control/managed_components/led_strip/src/led_strip_api.c", "/home/ybin/nas-fan-control/managed_components/led_strip/src/led_strip_rmt_dev.c", "/home/ybin/nas-fan-control/managed_components/led_strip/src/led_strip_rmt_encoder.c", "/home/ybin/nas-fan-control/managed_components/led_strip/src/led_strip_spi_dev.c" ],
+            "include_dirs": [ "include", "interface" ]
+        },
         "log": {
             "alias": "idf::log",
             "target": "___idf_log",
@@ -711,9 +726,9 @@
             "type": "LIBRARY",
             "lib": "__idf_main",
             "reqs": [],
-            "priv_reqs": [ "esp_adc", "esp_driver_ledc", "esp_driver_gpio", "esp_driver_pcnt", "esp_driver_tsens", "esp_pm" ],
+            "priv_reqs": [ "esp_adc", "esp_driver_ledc", "esp_driver_gpio", "esp_driver_pcnt", "esp_driver_tsens", "esp_pm", "led_strip" ],
             "managed_reqs": [],
-            "managed_priv_reqs": [],
+            "managed_priv_reqs": [ "led_strip" ],
             "file": "/home/ybin/nas-fan-control/build/esp-idf/main/libmain.a",
             "sources": [ "/home/ybin/nas-fan-control/main/oneshot_read_main.c" ],
             "include_dirs": [ "." ]
@@ -2143,10 +2158,22 @@
             "dir": "/home/ybin/nas-fan-control/main",
             "lib": "__idf_main",
             "reqs": [],
-            "priv_reqs": [ "esp_adc", "esp_driver_ledc", "esp_driver_gpio", "esp_driver_pcnt", "esp_driver_tsens", "esp_pm" ],
+            "priv_reqs": [ "esp_adc", "esp_driver_ledc", "esp_driver_gpio", "esp_driver_pcnt", "esp_driver_tsens", "esp_pm", "led_strip" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [ "led_strip" ],
+            "include_dirs": [ "." ]
+        },
+        "led_strip": {
+            "alias": "idf::led_strip",
+            "target": "___idf_led_strip",
+            "prefix": "idf",
+            "dir": "/home/ybin/nas-fan-control/managed_components/led_strip",
+            "lib": "__idf_led_strip",
+            "reqs": [ "esp_driver_rmt", "esp_driver_spi" ],
+            "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "include_dirs": [ "." ]
+            "include_dirs": [ "include", "interface" ]
         }
     },
     "debug_prefix_map_gdbinit": "",

@@ -94,5 +94,7 @@ $<TARGET_FILE:__idf_esp_driver_usb_serial_jtag>
 $<TARGET_FILE:__idf_esp_driver_twai>
 $<TARGET_FILE:idf::esp_adc>
 $<TARGET_FILE:__idf_driver>
+$<TARGET_FILE:idf::led_strip>
 $<TARGET_FILE:idf::main>
 $<TARGET_FILE:__idf_esp_adc>
+$<TARGET_FILE:__idf_led_strip>

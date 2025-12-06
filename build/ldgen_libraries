@@ -94,5 +94,7 @@
 /home/ybin/nas-fan-control/build/esp-idf/esp_driver_twai/libesp_driver_twai.a
 /home/ybin/nas-fan-control/build/esp-idf/esp_adc/libesp_adc.a
 /home/ybin/nas-fan-control/build/esp-idf/driver/libdriver.a
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/libled_strip.a
 /home/ybin/nas-fan-control/build/esp-idf/main/libmain.a
 /home/ybin/nas-fan-control/build/esp-idf/esp_adc/libesp_adc.a
+/home/ybin/nas-fan-control/build/esp-idf/led_strip/libled_strip.a
