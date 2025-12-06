@@ -5,7 +5,7 @@
 
 (See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-A fan controller for hard disks on your DIY NAS base on ESP32H2. By adjusting PWM according to the current consumption of 12V as well as temperature from NTC sensor to keep quiet.
+A fan controller for hard disks on your DIY NAS base on ESP32H2. By adjusting PWM according to the current consumption of 12V as well as temperature from NTC sensor to keep quiet. A benifit to reduce dust causing by unesiary air blow of course.
 
 The project is built ESP-IDF Example of ADC oneshot_read.
 
@@ -24,8 +24,8 @@ See circuit upload from PNG later on.
 
 ## Hardware Required
 
-* ESP32-H2 SupperMini development board
-* AD8418 current sensing
+* ESP32-H2 Zero development board
+* ACS70331 Hall current sensing
 * Bread board for integrated components and DIY circuit
 
 In this example, you need to connect a voltage source (e.g. a DC power supply) to the GPIO pins specified in `oneshot_read_main.c` (see the macros defined on the top of the source file). Feel free to modify the pin setting.
